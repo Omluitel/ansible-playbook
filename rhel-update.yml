@@ -1,0 +1,23 @@
+---
+- name: Update Red Hat System
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure the system is up to date
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+
+    - name: Reboot the system if a kernel update occurred
+      reboot:
+        when: "'kernel' in ansible_facts.packages"
+
+    - name: Clean all cached packages and metadata
+      command: yum clean all
+
+    - name: Remove unnecessary packages
+      yum:
+        name: '*'
+        state: absent
+        autoremove: yes
